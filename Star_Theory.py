@@ -2,15 +2,17 @@ import pygame
 import random
 
 """To Do List"""
-# 1. Give Baddies Bullets
-# 2. Have Shot Baddies Drop Items
-# 3. Introduce Different Classes of Baddies
+# 1. Give Enemies Bullets
+# 2. Have Shot Enemies Drop Items
+# 3. Introduce Different Classes of Enemies
 # 4. Create Splash Screen
-# 5. Start Menu
+# 5. Start Menu [roughly done - have to pretty it up]
 # 6. High Score List
 # 7. Start Using png Sprite images
-# 8. Create Distinct Bullet, Hero, and Enemy Classes
+# 8. Create Distinct Bullet, Hero, and Enemy Classes [sort of done, make more explicit and clean]
 # 9. Add explosion animation
+# 10. Options to restart/quit at death screen [sort of done, make more explicit and clean]
+
 
 """Done"""
 # Pause Function
@@ -19,6 +21,7 @@ import random
 # Rainbow Laser
 # Wrap Around
 # Starfield
+# Death Screen
 
 
 
@@ -42,7 +45,7 @@ def main_loop():
 		
 	class Block(pygame.sprite.Sprite):
 		"""
-		This class represents the ball.
+		This class represents the skeleton for enemy/hero/other rect-based objects.
 		It derives from the "Sprite" class in Pygame.
 		"""
 		def __init__(self, color, width, height):
@@ -115,7 +118,7 @@ def main_loop():
 	adjusted_screen_width = screen_width - 20
 
 	for i in range(10):
-		# this represents a block
+		# this represents an enemy block
 		bad_color = random.randint(50, 250)
 		block = Block((bad_color,bad_color,bad_color), 20, 15)
 		
@@ -209,7 +212,7 @@ def main_loop():
 		# clear the screen to be drawn upon
 		screen.fill(BLACK)
 		
-		# make more shinies at random intervals
+		# make more enemies at random intervals
 		if random.randint(0, 10) == 3:	
 			new_bad_color = random.randint(50, 250)
 			block = Block((new_bad_color,new_bad_color,new_bad_color), 20, 15)
@@ -218,7 +221,7 @@ def main_loop():
 			block_list.add(block)
 			all_sprites_list.add(block)
 
-		#check for baddie shot
+		#check for enemy shot
 		for bullet in bullet_list:
 			bullet_hit_list = pygame.sprite.spritecollide(bullet, block_list, True)
 			for block in bullet_hit_list:
@@ -240,7 +243,7 @@ def main_loop():
 						restart = True
 						done = True
 			
-		# animate the baddies
+		# animate the enemies
 		for block in block_list:
 			# moving down
 			block.rect.y += random.randrange(0, 5)
