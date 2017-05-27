@@ -194,21 +194,34 @@ def main_loop():
 		    good_speed = 10
 		else:
 		    good_speed = 5
+
 		if key[pygame.K_LEFT]:
-			if player.rect.x < 1:
-				player.rect.x = adjusted_screen_width #screen_width
-				bullet.rect.x = player.rect.x + center
+			if not key[pygame.K_DOWN]:
+				if player.rect.x < 1:
+					player.rect.x = adjusted_screen_width #screen_width
+					bullet.rect.x = player.rect.x + center
+				else:
+					player.rect.x -= good_speed
+					bullet.rect.x = player.rect.x + center
 			else:
-				player.rect.x -= good_speed
-				bullet.rect.x = player.rect.x + center
+				for block in block_list:
+					block.rect.x += good_speed
+				for star in star_list:
+					star.rect.x += good_speed
+
 		if key[pygame.K_RIGHT]:
-			if player.rect.x > adjusted_screen_width: #screen_width:
-				player.rect.x = 0
-				bullet.rect.x = player.rect.x + center
+			if not key[pygame.K_DOWN]:
+				if player.rect.x > adjusted_screen_width: #screen_width:
+					player.rect.x = 0
+					bullet.rect.x = player.rect.x + center
+				else:
+					player.rect.x += good_speed
+					bullet.rect.x = player.rect.x + center
 			else:
-				player.rect.x += good_speed
-				bullet.rect.x = player.rect.x + center
-			
+				for block in block_list:
+					block.rect.x -= good_speed
+				for star in star_list:
+					star.rect.x -= good_speed
 		# clear the screen to be drawn upon
 		screen.fill(BLACK)
 		
@@ -235,9 +248,11 @@ def main_loop():
 				death_text = myFont.render("DEAD: " + str(score) +
 					" POINTS", 1, (WHITE))
 				screen.blit(death_text, (0, 0))
+				play_again_text = myFont.render("Try Again? [y/n]", 1, (WHITE))
+				screen.blit(play_again_text, (0, 20))
 				pygame.display.flip()
 				for event in pygame.event.get():
-					if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+					if event.type == pygame.KEYDOWN and event.key == pygame.K_n:
 						done = True	
 					elif event.type == pygame.KEYDOWN and event.key == pygame.K_y:
 						restart = True
@@ -263,8 +278,8 @@ def main_loop():
 		randcolor = random.randrange(100, 255)
 		randxy = random.randrange(1, 5)
 		star = Block((randcolor,randcolor,randcolor), randxy, randxy)
-		star.rect.x = random.randrange(0, adjusted_screen_width) #screen_width)
-		star.rect.y = random.randrange(-200, screen_height)
+		star.rect.x = random.randrange(-100, screen_width + 100) #screen_width)
+		star.rect.y = random.randrange(-400, screen_height)
 		star_list.add(star)
 		
 		# animate stars
