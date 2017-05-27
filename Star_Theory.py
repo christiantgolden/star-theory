@@ -1,6 +1,8 @@
 import pygame
 import random
 
+pygame.init()
+
 """To Do List"""
 # 1. Give Enemies Bullets
 # 2. Have Shot Enemies Drop Items
@@ -27,25 +29,32 @@ import random
 
 def main_loop():
 
+	clock = pygame.time.Clock()
+
 	restart = False
+	done 	= False
 
-	if pygame.init():
-		pygame.quit()
-		
-	pygame.init()
+	BLACK 	= (000,000,000)
+	WHITE 	= (255,255,255)
+	LGRAY 	= (200,200,200)
+	GRAY 	= (100,100,100)
+	RED   	= (255,000,000)
+	BLUE  	= (000,000,255)
+	GREEN 	= (000,255,000)
+	DGREEN 	= (000,175,000)
 
-	BLACK = (000,000,000)
-	WHITE = (255,255,255)
-	LGRAY = (200,200,200)
-	GRAY = (100,100,100)
-	RED   = (255,000,000)
-	BLUE  = (000,000,255)
-	GREEN = (000,255,000)
-	DGREEN = (000,175,000)
+	#set the height and width of the screen
+	screen_width = 700
+	screen_height = 400
+	screen = pygame.display.set_mode([screen_width, screen_height])
+	score = 0
+
+	myFont = pygame.font.SysFont("monospace", 22)
+
 		
 	class Block(pygame.sprite.Sprite):
 		"""
-		This class represents the skeleton for enemy/hero/other rect-based objects.
+		This class represents the skeleton for enemies/other rect-based objects.
 		It derives from the "Sprite" class in Pygame.
 		"""
 		def __init__(self, color, width, height):
@@ -59,14 +68,11 @@ def main_loop():
 			# This could also be an image loaded from the disk.
 			self.image = pygame.Surface([width, height])
 			self.image.fill(color)
-			#self.image.set_colorkey(BLACK)
 			
 			# Draw the ellipse
 			pygame.draw.ellipse(self.image, color, [0, 0, width, height])
 
 			# Fetch the rectangle object that has the dimensions of the image
-			# Update the position of this object by setting the values
-			# of rect.x and rect.y
 			self.rect = self.image.get_rect()
 			
 	class Hero(pygame.sprite.Sprite):
@@ -75,16 +81,6 @@ def main_loop():
 			self.image = pygame.image.load("hero.bmp")
 			self.image.set_colorkey(RED)
 			self.rect = self.image.get_rect()
-			
-	# initialize Pygame
-	#if not pygame.init():
-	#	pygame.init()
-
-	#set the height and width of the screen
-	screen_width = 700
-	screen_height = 400
-	screen = pygame.display.set_mode([screen_width, screen_height])
-	score = 0
 
 	def startScreen():
 		while True:
@@ -106,7 +102,7 @@ def main_loop():
 				if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
 					return
 					
-	# Groups.
+	# Groups of sprites.
 	block_list = pygame.sprite.Group()
 	bullet_list = pygame.sprite.Group()
 	star_list = pygame.sprite.Group()
@@ -148,10 +144,6 @@ def main_loop():
 	bullet_energy_bar.y = 0
 	bullet_panel_list.add(bullet_energy_bar)
 
-	done = False
-
-	clock = pygame.time.Clock()
-
 	player.rect.x = screen_width/2
 	player.rect.y = screen_height - 35
 
@@ -159,10 +151,9 @@ def main_loop():
 
 	center = 15
 
-
 	# add score keeper on screen
-	myFont = pygame.font.SysFont("monospace", 22)
-	myFont.set_bold(True)
+	#myFont = pygame.font.SysFont("monospace", 20)
+	#myFont.set_bold(False)
 
 	startScreen()
 
@@ -186,9 +177,8 @@ def main_loop():
 				bullet_list.add(bullet)
 				bullet.rect.x = player.rect.x + center
 				bullet.rect.y = screen_height - 8
-				#if bullet_energy_bar.rect.y < screen_height:
 				bullet_energy_bar.rect.y += 1
-		if not key[pygame.K_SPACE] and bullet_energy_bar.rect.y > 0:
+		elif bullet_energy_bar.rect.y > 0:
 			bullet_energy_bar.rect.y -= 1
 						
 		#key = pygame.key.get_pressed()
@@ -307,8 +297,10 @@ def main_loop():
 		# Go ahead and update the screen with what we've drawn
 		pygame.display.flip()
 	
-	#pygame.display.quit()
-	pygame.quit()
 	if restart == True:
 	    main_loop()
+
+	pygame.display.quit()
+	pygame.quit()
+
 main_loop()
