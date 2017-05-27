@@ -90,6 +90,8 @@ def main_loop():
 		while True:
 			welcome = myFont.render("Welcome to Star Theory!", 1, (WHITE))
 			screen.blit(welcome, (screen_width/4, 0))
+			press_to_start = myFont.render("Press any key to play...", 1, (WHITE))
+			screen.blit(press_to_start, (screen_width/4, screen_height/2))
 			pygame.display.flip()
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
@@ -184,8 +186,8 @@ def main_loop():
 				bullet_list.add(bullet)
 				bullet.rect.x = player.rect.x + center
 				bullet.rect.y = screen_height - 8
-				if bullet_energy_bar.rect.y < screen_height:
-					bullet_energy_bar.rect.y += 1
+				#if bullet_energy_bar.rect.y < screen_height:
+				bullet_energy_bar.rect.y += 1
 		if not key[pygame.K_SPACE] and bullet_energy_bar.rect.y > 0:
 			bullet_energy_bar.rect.y -= 1
 						
