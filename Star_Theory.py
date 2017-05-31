@@ -68,9 +68,6 @@ def main_loop():
 			# This could also be an image loaded from the disk.
 			self.image = pygame.Surface([width, height])
 			self.image.fill(color)
-			
-			# Draw the ellipse
-			pygame.draw.ellipse(self.image, color, [0, 0, width, height])
 
 			# Fetch the rectangle object that has the dimensions of the image
 			self.rect = self.image.get_rect()
@@ -79,6 +76,13 @@ def main_loop():
 		def __init__(self):
 			super(Hero, self).__init__()
 			self.image = pygame.image.load("hero.bmp")
+			self.image.set_colorkey(RED)
+			self.rect = self.image.get_rect()
+
+	class Enemy(pygame.sprite.Sprite):
+		def __init__(self):
+			super(Enemy, self).__init__()
+			self.image = pygame.image.load("enemy.bmp")
 			self.image.set_colorkey(RED)
 			self.rect = self.image.get_rect()
 
@@ -107,40 +111,45 @@ def main_loop():
 	bullet_list = pygame.sprite.Group()
 	star_list = pygame.sprite.Group()
 	all_sprites_list = pygame.sprite.Group()
-	side_panel_list = pygame.sprite.Group()
 	bullet_panel_list = pygame.sprite.Group()
+	enemy_list = pygame.sprite.Group()
+	hero_list = pygame.sprite.Group()
 
 	player = Hero()
-	all_sprites_list.add(player)
+	hero_list.add(player)
 
-	adjusted_screen_width = screen_width - 20
-
-	for i in range(10):
+	'''for i in range(10):
 		# this represents an enemy block
 		bad_color = random.randint(50, 250)
 		block = Block((bad_color,bad_color,bad_color), 20, 15)
 		
 		# set a random location for the block
-		block.rect.x = random.randrange(adjusted_screen_width)
+		block.rect.x = random.randrange(screen_width)
 		block.rect.y = random.randrange(-200, 0)
 		
 		# add the block to the list of objects
 		block_list.add(block)
-		all_sprites_list.add(block)
+		all_sprites_list.add(block)'''
+
+	for i in range(10):
+		enemy = Enemy()
+		enemy.rect.x = random.randrange(screen_width)
+		enemy.rect.y = random.randrange(-200, 0)
+		enemy_list.add(enemy)
 			
 	# create player bullet
 	bullet = Block(RED, 3, screen_height)
 
 
 	# create sidepanel
-	sidepanel = Block(BLACK, 20, screen_height)
-	sidepanel.rect.x = adjusted_screen_width
-	sidepanel.rect.y = 0
-	side_panel_list.add(sidepanel)
+	#sidepanel = Block(BLACK, 20, screen_height)
+	#sidepanel.rect.x = adjusted_screen_width
+	#sidepanel.rect.y = 0
+	#side_panel_list.add(sidepanel)
 
 	# bullet_energy_bar
 	bullet_energy_bar = Block(WHITE, 20, screen_height)
-	bullet_energy_bar.rect.x = adjusted_screen_width
+	bullet_energy_bar.rect.x = screen_width - 20
 	bullet_energy_bar.y = 0
 	bullet_panel_list.add(bullet_energy_bar)
 
@@ -190,51 +199,61 @@ def main_loop():
 		if key[pygame.K_LEFT]:
 			if not key[pygame.K_DOWN]:
 				if player.rect.x < 1:
-					player.rect.x = adjusted_screen_width #screen_width
+					player.rect.x = screen_width - 35
 					bullet.rect.x = player.rect.x + center
 				else:
 					player.rect.x -= good_speed
 					bullet.rect.x = player.rect.x + center
 			else:
-				for block in block_list:
-					block.rect.x += good_speed
+				'''for block in block_list:
+					block.rect.x += good_speed/2
 				for star in star_list:
-					star.rect.x += good_speed
+					star.rect.x += good_speed/2'''
 
+				for enemy in enemy_list:
+					enemy.rect.x += good_speed/2
+				for star in star_list:
+					star.rect.x += good_speed/2
 		if key[pygame.K_RIGHT]:
 			if not key[pygame.K_DOWN]:
-				if player.rect.x > adjusted_screen_width: #screen_width:
+				if player.rect.x > screen_width - 35: #screen_width:
 					player.rect.x = 0
 					bullet.rect.x = player.rect.x + center
 				else:
 					player.rect.x += good_speed
 					bullet.rect.x = player.rect.x + center
 			else:
-				for block in block_list:
-					block.rect.x -= good_speed
+				'''for block in block_list:
+					block.rect.x -= good_speed/2
 				for star in star_list:
-					star.rect.x -= good_speed
+					star.rect.x -= good_speed/2'''
+
+				for enemy in enemy_list:
+					enemy.rect.x -= good_speed/2
+				for star in star_list:
+					star.rect.x -= good_speed/2
 		# clear the screen to be drawn upon
 		screen.fill(BLACK)
 		
 		# make more enemies at random intervals
 		if random.randint(0, 10) == 3:	
-			new_bad_color = random.randint(50, 250)
-			block = Block((new_bad_color,new_bad_color,new_bad_color), 20, 15)
-			block.rect.x = random.randrange(adjusted_screen_width) #(screen_width)
-			block.rect.y = random.randrange(-200, 0)
-			block_list.add(block)
-			all_sprites_list.add(block)
+			#new_bad_color = random.randint(50, 250)
+			#block = Block((new_bad_color,new_bad_color,new_bad_color), 20, 15)
+			enemy = Enemy()
+			enemy.rect.x = random.randrange(screen_width) #(screen_width)
+			enemy.rect.y = random.randrange(-200, 0)
+			enemy_list.add(enemy)
+			all_sprites_list.add(enemy)
 
 		#check for enemy shot
 		for bullet in bullet_list:
-			bullet_hit_list = pygame.sprite.spritecollide(bullet, block_list, True)
-			for block in bullet_hit_list:
+			bullet_hit_list = pygame.sprite.spritecollide(bullet, enemy_list, True)
+			for enemy in bullet_hit_list:
 				bullet_list.remove(bullet)
 				score += 1
 				
 		#check for death (collision)
-		death = pygame.sprite.spritecollide(player, block_list, False)
+		death = pygame.sprite.spritecollide(player, enemy_list, False)
 		if death:
 			while done == False:
 				death_text = myFont.render("DEAD: " + str(score) +
@@ -251,17 +270,17 @@ def main_loop():
 						done = True
 			
 		# animate the enemies
-		for block in block_list:
+		for enemy in enemy_list:
 			# moving down
-			block.rect.y += random.randrange(0, 5)
-			if block.rect.y > screen_height:
-				block.rect.y = 0
+			enemy.rect.y += random.randrange(0, 5)
+			if enemy.rect.y > screen_height:
+				enemy.rect.y = 0
 			# moving left and right
-			block.rect.x += random.randrange(-8, 8)
-			if block.rect.x > adjusted_screen_width: #screen_width:
-				block.rect.x = 0
-			if block.rect.x < 0:
-				block.rect.x = adjusted_screen_width #screen_width
+			enemy.rect.x += random.randrange(-4, 5)
+			if enemy.rect.x > screen_width: #screen_width:
+				enemy.rect.x = 0
+			if enemy.rect.x < 0:
+				enemy.rect.x = screen_width
 
 		# animate bullets
 		for bullet in bullet_list:
@@ -270,7 +289,7 @@ def main_loop():
 		randcolor = random.randrange(100, 255)
 		randxy = random.randrange(1, 5)
 		star = Block((randcolor,randcolor,randcolor), randxy, randxy)
-		star.rect.x = random.randrange(-100, screen_width + 100) #screen_width)
+		star.rect.x = random.randrange(-400, screen_width + 400) #screen_width)
 		star.rect.y = random.randrange(-400, screen_height)
 		star_list.add(star)
 		
@@ -283,8 +302,10 @@ def main_loop():
 		# draw all the sprites
 		star_list.draw(screen)
 		bullet_list.draw(screen)	
-		all_sprites_list.draw(screen)
-		side_panel_list.draw(screen)
+		#all_sprites_list.draw(screen)
+		enemy_list.draw(screen)
+		hero_list.draw(screen)
+		#side_panel_list.draw(screen)
 		bullet_panel_list.draw(screen)
 		
 		# draw the scoreboard
